@@ -1,29 +1,23 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-project(hello_world
+project(functional_programming
         VERSION 1.0
-        DESCRIPTION "Hello World application"
+        DESCRIPTION "Examples of C++ programming using Functional Features, algorithm & numeric header"
         LANGUAGES CXX)
-
-# Default to Release build type
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-endif()
-
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/hello_world.cpp
-        hello_world.cpp)
+set(USING_ALGORITHMS_TARGET_NAME "using_algorithms")
+add_executable(${USING_ALGORITHMS_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_ALGORITHMS_TARGET_NAME}.cpp")
 
-# Compiler Options: will enable almost all of the warnings available for a compiler
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
+set(USING_FUNCTIONAL_TARGET_NAME "using_functional")
+add_executable(${USING_FUNCTIONAL_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_FUNCTIONAL_TARGET_NAME}.cpp")
 
-# defining an output folder
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
+set(USING_NUMERIC_TARGET_NAME "using_numeric")
+add_executable(${USING_NUMERIC_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_NUMERIC_TARGET_NAME}.cpp")
