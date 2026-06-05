@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-project(eigen_premier
+project(stats_cpp
         VERSION 1.0
-        DESCRIPTION "Eigen premier"
+        DESCRIPTION "Gen random numbers"
         LANGUAGES CXX)
 
 # C++17 is mandatory
@@ -10,14 +10,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-endif()
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
-add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/src/main.cpp")
-
-# include Eigen3
-find_package(Eigen3 3.4 REQUIRED NO_MODULE)
-target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/using_stat_distros.cpp)
