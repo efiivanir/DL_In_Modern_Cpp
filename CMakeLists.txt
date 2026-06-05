@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-project(functional_programming
+project(using_lambdas
         VERSION 1.0
-        DESCRIPTION "Examples of C++ programming using Functional Features, algorithm & numeric header"
+        DESCRIPTION "Playing with Lambdas"
         LANGUAGES CXX)
+
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,11 +14,4 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-set(USING_ALGORITHMS_TARGET_NAME "using_algorithms")
-add_executable(${USING_ALGORITHMS_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_ALGORITHMS_TARGET_NAME}.cpp")
-
-set(USING_FUNCTIONAL_TARGET_NAME "using_functional")
-add_executable(${USING_FUNCTIONAL_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_FUNCTIONAL_TARGET_NAME}.cpp")
-
-set(USING_NUMERIC_TARGET_NAME "using_numeric")
-add_executable(${USING_NUMERIC_TARGET_NAME} "${PROJECT_SOURCE_DIR}/src/${USING_NUMERIC_TARGET_NAME}.cpp")
+add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/src/main.cpp")
