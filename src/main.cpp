@@ -1,38 +1,47 @@
-#include <algorithm>
-#include <iostream>
-#include <numeric>
-#include <vector>
+#include <Eigen/Dense>
 
-using VectorType = std::vector<double>;
+#include <iostream>
 
 int main() {
-    auto L2 = [](const VectorType &vec) { return std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0); };
+    Eigen::MatrixXd A(2, 2);
+    A(0, 0) = 2.;
+    A(1, 0) = -2.;
+    A(0, 1) = 3.;
+    A(1, 1) = 1.;
 
-    VectorType weights{1., 2., 3., 4., 5., 6.};
+    Eigen::MatrixXd B(2, 3);
+    B(0, 0) = 1.;
+    B(1, 0) = 1.;
+    B(0, 1) = 2.;
+    B(1, 1) = 2.;
+    B(0, 2) = -1.;
+    B(1, 2) = 1.;
 
-    std::cout << "L2(weights) = " << L2(weights) << "\n";
+    auto C = A * B;
 
-    // Data members of classes (but not structs) additionally have trailing underscores.
-    auto momentum_optimizer = [vec_ = VectorType{}](const VectorType &gradient) mutable {
-        if (vec_.empty()) {
-            vec_.resize(gradient.size());
-        }
-        std::transform(vec_.begin(), vec_.end(), gradient.begin(), vec_.begin(), [](double v, double dx) {
-            double beta = 0.3;
-            return beta * v + dx;
-        });
-        return vec_;
-    };
+    std::cout << "A:\n" << A << "\n";
+    std::cout << "B:\n" << B << "\n";
+    std::cout << "C:\n" << C << "\n";
 
-    auto print = [](double d) { std::cout << d << " "; };
+    auto D = B.cwiseProduct(C);
+    std::cout << "coeficient-wise multiplication of B & C is:\n" << D << "\n";
 
-    const VectorType current_grads{1., 0., 1., 1., 0., 1.};
-    for (int i = 0; i < 3; ++i) {
-        VectorType weight_update = momentum_optimizer(current_grads);
-        std::for_each(weight_update.begin(), weight_update.end(), print);
-        std::cout << "\n";
-    }
+    auto E = B + C;
+    std::cout << "The sum of B & C is:\n" << E << "\n";
+
+    std::cout << "The transpose of B is:\n" << B.transpose() << "\n";
+
+    std::cout << "The A inverse is:\n" << A.inverse() << "\n";
+
+    std::cout << "The determinant of A is:\n" << A.determinant() << "\n";
+
+    std::cout << "Example of unary operation:\n";
+    auto func_X_X = [](double x) { return x * x; };
+    std::cout << A.unaryExpr(func_X_X) << "\n";
+
+    std::cout << "Example of binary operation:\n";
+    auto func_X_Y = [](double x, double y) { return x * y; };
+    std::cout << B.binaryExpr(C, func_X_Y) << "\n";
 
     return 0;
 }
-
