@@ -1,47 +1,54 @@
 #include <eigen3/Eigen/Dense>
-
-#include <iostream>
+#include "glorot.h"
+#include <fmt/format.h>
+#include <spdlog/spdlog.h>
+#include <numeric>
 
 int main() {
-    Eigen::MatrixXd A(2, 2);
-    A(0, 0) = 2.;
-    A(1, 0) = -2.;
-    A(0, 1) = 3.;
-    A(1, 1) = 1.;
+    int fan_in = 6;
+    int fan_out = 5;
 
-    Eigen::MatrixXd B(2, 3);
-    B(0, 0) = 1.;
-    B(1, 0) = 1.;
-    B(0, 1) = 2.;
-    B(1, 1) = 2.;
-    B(0, 2) = -1.;
-    B(1, 2) = 1.;
+    auto weigths = glorot_initializer(fan_in, fan_out);
 
-    auto C = A * B;
+    const std::size_t N = weigths.size();
 
-    std::cout << "A:\n" << A << "\n";
-    std::cout << "B:\n" << B << "\n";
-    std::cout << "C:\n" << C << "\n";
+    const auto welcome_message =
+        fmt::format("fan_in {} fan_out {}\n", fan_in, fan_out);
+    spdlog::info(welcome_message);
 
-    auto D = B.cwiseProduct(C);
-    std::cout << "coeficient-wise multiplication of B & C is:\n" << D << "\n";
+    const auto sum = static_cast<float>(std::accumulate(weigths.begin(),
+                                                    weigths.end(), 0.0));
+    float weight_mean = sum / static_cast<float>(N);
 
-    auto E = B + C;
-    std::cout << "The sum of B & C is:\n" << E << "\n";
+    float acc = 0.0;
 
-    std::cout << "The transpose of B is:\n" << B.transpose() << "\n";
+    auto differ = [&acc, &weight_mean](const float val) {
+        const float diff = val - weight_mean;
+        acc += diff * diff;
+        const auto dif_fmt = fmt::format("acc {} weight_mean {} diff {} val {}",
+            acc, weight_mean, diff, val);
+        // spdlog::info(dif_fmt);
 
-    std::cout << "The A inverse is:\n" << A.inverse() << "\n";
+    };
 
-    std::cout << "The determinant of A is:\n" << A.determinant() << "\n";
+    std::for_each(weigths.begin(), weigths.end(), differ);
 
-    std::cout << "Example of unary operation:\n";
-    auto func_X_X = [](double x) { return x * x; };
-    std::cout << A.unaryExpr(func_X_X) << "\n";
+    float actual_stdev = std::sqrt(acc / static_cast<float>(N - 1));
 
-    std::cout << "Example of binary operation:\n";
-    auto func_X_Y = [](double x, double y) { return x * y; };
-    std::cout << B.binaryExpr(C, func_X_Y) << "\n";
+    const auto expected_stddev = static_cast<float>(std::sqrt(2. / (fan_in + fan_out)));
 
-    return 0;
+    bool std_dev_rejected = chi_squared_test(expected_stddev,
+        actual_stdev, static_cast<int>(N), 0.05);
+
+    if (std_dev_rejected) {
+        spdlog::warn("The weights standard deviation do not look like expected by the Glorot initializer");
+    }
+
+    bool mean_rejected = t_test(0., weight_mean, actual_stdev, static_cast<int>(N), 0.05);
+
+    if (mean_rejected) {
+        spdlog::warn("The weights mean do not look like expected by the Glorot initializer");
+    }
+
+
 }
